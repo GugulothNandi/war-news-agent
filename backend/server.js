@@ -13,8 +13,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/news", newsRoutes);
-
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -23,5 +21,10 @@ mongoose
   })
   .catch((err) => console.log(err));
 
+// Test route (does not depend on DB)
+app.get("/", (req, res) => {
+  res.send("API is working");
+});
+app.use("/api/news", newsRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
