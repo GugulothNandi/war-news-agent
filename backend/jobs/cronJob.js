@@ -23,5 +23,5 @@ async function runJob() {
 
 export default function startCron() {
   console.log("Cron job started...");
-  cron.schedule("* * * * *", runJob);
+  cron.schedule("0 * * * *", runJob);
 }
