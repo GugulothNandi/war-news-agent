@@ -17,7 +17,7 @@ async function runJob() {
     console.log("Articles fetched:", articles.length);
 
     // ✅ ONLY 10 NEWS
-    const limitedArticles = articles.slice(0, 10);
+    const limitedArticles = articles.slice(0, 1);
 
     let message = "⚠ War News Updates:\n\n";
 
