@@ -1,15 +1,41 @@
-import { Telegraf } from "telegraf";
+import axios from "axios";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
-
 export default async function sendAlert(message) {
   try {
-    await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, message);
-    console.log("Telegram alert sent");
+    console.log("Sending to Telegram...");
+
+    const res = await axios.post(
+      `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
+      {
+        chat_id: process.env.TELEGRAM_CHAT_ID,
+        text: message,
+      },
+      {
+        timeout: 10000, // 10 sec timeout
+      },
+    );
+
+    console.log("Telegram SUCCESS:", res.data);
   } catch (err) {
-    console.error("Error sending Telegram message:", err);
+    console.error("Telegram ERROR:", err.message);
+
+    // 🔁 Retry once (important)
+    try {
+      console.log("Retrying...");
+      const retry = await axios.post(
+        `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
+        {
+          chat_id: process.env.TELEGRAM_CHAT_ID,
+          text: message,
+        },
+      );
+
+      console.log("Telegram SUCCESS after retry:", retry.data);
+    } catch (retryErr) {
+      console.error("Retry failed:", retryErr.message);
+    }
   }
 }

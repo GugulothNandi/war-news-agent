@@ -1,27 +1,33 @@
 import cron from "node-cron";
 import { fetchNews } from "../services/newsFetcher.js";
-import summarize from "../services/summarizer.js";
 import sendAlert from "../services/telegramService.js";
-import { News } from "../models/News.js";
 
 async function runJob() {
-  console.log("Fetching war news...");
-  const articles = await fetchNews();
+  try {
+    console.log("Fetching war news...");
+    const articles = await fetchNews();
 
-  for (let article of articles) {
-    const summary = await summarize(article.title);
+    console.log("Articles fetched:", articles.length);
 
-    const news = await News.create({
-      title: article.title,
-      summary,
-      source: article.link,
-    });
+    // ✅ take only 3 articles for testing
+    const limitedArticles = articles.slice(0, 3);
 
-    await sendAlert(`⚠ War News\n${news.title}\n\n${summary}`);
+    let message = "⚠ War News Updates:\n\n";
+
+    for (let article of limitedArticles) {
+      message += `• ${article.title}\n\n`;
+    }
+
+    console.log("Sending message...");
+
+    // ✅ ALWAYS send (for testing)
+    await sendAlert(message);
+  } catch (err) {
+    console.error("CRON ERROR:", err);
   }
 }
 
 export default function startCron() {
   console.log("Cron job started...");
-  cron.schedule("0 * * * *", runJob);
+  cron.schedule("* * * * *", runJob); // every minute
 }
