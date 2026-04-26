@@ -54,5 +54,5 @@ async function runJob() {
 // ✅ RUN EVERY 20 MINUTES
 export default function startCron() {
   console.log("Cron job started...");
-  cron.schedule("*/20 * * * *", runJob);
+  cron.schedule("* * * * *", runJob);
 }
